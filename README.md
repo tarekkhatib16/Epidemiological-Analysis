@@ -1,4 +1,4 @@
-# R Project
+# Epidemiological Analysis Using R
 
 In this project I modelled data given to me using the SIR model. The SIR model is an epidemiological model that allows us to see the theoretical number of infected people.
 
