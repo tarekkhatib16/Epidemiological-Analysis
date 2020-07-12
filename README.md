@@ -9,3 +9,5 @@ The system occurs in 3 differential equations:
 *dI/dt = BSI - YI*
 
 *dR/dt = YI*
+
+I used the above 3 equations to visualise the data.
