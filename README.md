@@ -5,5 +5,7 @@ In this project I modelled data given to me using the SIR model. The SIR model i
 The system occurs in 3 differential equations:
 
 *dS/dt = -BSI*
+
 *dI/dt = BSI - YI*
+
 *dR/dt = YI*
