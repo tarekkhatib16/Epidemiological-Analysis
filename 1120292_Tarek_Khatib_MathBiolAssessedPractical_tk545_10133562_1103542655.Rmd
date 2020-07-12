@@ -1,0 +1,198 @@
+---
+title: "MathBiolAssessedPractical2_tk545"
+author: "Tarek Khatib"
+date: "12/04/2019"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+#1
+
+```{r}
+#1
+
+r0 <- function(beta,gamma,N){
+  output <- beta*N/gamma
+  return(output)
+}
+```
+
+#2
+
+```{r}
+#2
+
+gamma_gay <-seq(0.1, 2, 0.01)
+plot(gamma_gay, r0(0.01,gamma_gay,100), type="l", xlab = "recovery state (gamma)", ylab = "r0", main = "r0 against recovery state (gamma)")
+abline(h=1, col="coral2")
+legend("right", inset=0.2, c("r0 against recovery rate (gamma)", "r0=1"), fill=c("black", "coral2"))
+```
+
+#3
+
+```{r}
+#3
+
+SIR_dydt <- function(t, y, parms){
+  #Parameters
+  beta <- parms[1]
+  gamma <- parms[2]
+  #Variables
+  S <- y[1]
+  I <- y[2]
+  #Calculate the two derivatives
+  dS <- -beta*S*I
+  dI <- beta*S*I - gamma*I
+  return(list(c(dS,dI)))
+}
+```
+
+#4a
+
+```{r}
+#4a
+
+beta <- 0.01
+gamma <- 0.4
+I <- 1
+
+for(S in seq(10,100,10))
+{
+  dI <- beta*S*I - gamma*I
+  if(dI>0){
+    print(paste('dI/dt is', dI, 'which is positive as beta*S>gamma'))
+  }else if(dI==0){
+    print(paste('dI/dt is', dI, 'as beta*S=gamma'))
+  }else{
+    print(paste('dI/dt is', dI, 'which is not positive as beta*S<=gamma'))
+  }
+}
+```
+
+#4b
+
+The critical density of susceptible individuals required for an epidemic is equal to 40 individuals
+
+#5
+
+```{r}
+#5
+
+library(deSolve)
+
+N <- 100
+beta <- 0.01
+gamma <- 0.4
+
+#Initial conditions 
+s0 <- 99.9
+i0 <- 0.1
+
+#time steps 
+steps <- seq(0,50)
+
+
+#Solution 
+SIR_solution <- ode(c(s0,i0), steps, SIR_dydt, c(beta, gamma))
+
+#Plot
+plot(SIR_solution, type="l", main="SIR model", col="steelblue3")
+
+#Phase plane
+plot(SIR_solution[,2], SIR_solution[,3], type="l", xlab="S", ylab="I", main="Phase Plane", ylim=c(0,100))
+abline(a=100, b=-1, lty=3, col="salmon3")
+#S-nullclines 
+abline(h=0, v=0, col="plum3", lty=1)
+#I-nullclines 
+abline(h=0, v= (gamma/beta), col="rosybrown2", lty=2)
+```
+
+#6
+
+```{r}
+#6
+
+N <- 100
+R <- c(N- SIR_solution[,2]-SIR_solution[,3])
+
+plot(SIR_solution[,"time"], SIR_solution[,2], type="l", main="Solutions of SIR Model", xlab="time",ylab="S/I/R", col="paleturquoise2", ylim=c(0,100))
+lines(SIR_solution[,"time"], SIR_solution[,3], type="l", col="palegreen2")
+lines(SIR_solution[,"time"], R, type = "l", col="palevioletred2")
+legend(37,60,legend=c("Susceptible", "Infected", "Recovered"), col=c("paleturquoise2", "palegreen2", "palevioletred2"), lty=1)
+```
+
+#7a
+
+```{r}
+#7a
+
+fes_eq <- function(f,r0){
+  output2 <- 1 - f - exp(-1*r0*f)
+  return(output2)
+}
+```
+
+#7b
+
+```{r}
+#7b
+
+f_is <- seq(0,1,0.01)
+plot(f_is, fes_eq(f_is,2.5), type="l", xlab="final epidemic size f", ylab="left hand side of equation", col="coral2")
+```
+
+#7c
+
+```{r}
+#7c
+
+f_2 <- 1
+while(fes_eq(f_2,2.5) <= 0){
+  f_2 <- f_2 - 0.001
+  print(paste("when f is", f_2, "fes_eq is", fes_eq(f_2,2.5)))
+}
+
+print(f_2)
+```
+
+#7d
+
+```{r}
+#7d
+
+fes_sol <- function(r0){
+  f2 <- 1
+  while(fes_eq(f2,r0)<=0){
+    f2 <- f2 - 0.001
+  }
+  return(f2)
+}
+
+#to prove that it works we can imput r0=2.5 to see if we get f=0.892
+
+print(fes_sol(2.5))
+```
+
+#7e
+
+```{r}
+#7e
+
+R00 <- seq(1,6,0.5)
+a <- fes_sol(r0=1.5)
+b <- fes_sol(r0=2)
+c <- fes_sol(r0=2.5)
+d <- fes_sol(r0=3)
+e <- fes_sol(r0=3.5)
+g <- fes_sol(r0=4)
+h <- fes_sol(r0=4.5)
+i <- fes_sol(r0=5)
+j <- fes_sol(r0=5.5)
+k <- fes_sol(r0=6)
+fplot <- c(0,a,b,c,d,e,g,h,i,j,k)
+plot(R00, fplot, type='l',xlab='r0',ylab='f')
+
+```
+when R0=1, f=0, so fes_sol can't be used.
